@@ -1,3 +1,0 @@
-/home/abdulla/Desktop/Udacity-Cpp-Nanodegree-Capstone-Project/build/CMakeFiles/rebuild_cache.dir
-/home/abdulla/Desktop/Udacity-Cpp-Nanodegree-Capstone-Project/build/CMakeFiles/edit_cache.dir
-/home/abdulla/Desktop/Udacity-Cpp-Nanodegree-Capstone-Project/build/CMakeFiles/car-tracker.dir

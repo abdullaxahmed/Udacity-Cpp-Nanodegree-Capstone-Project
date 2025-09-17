@@ -11,9 +11,11 @@ int main(){
     while(vp.readFrame()) {
         cc.ConvertFrameColor();
         fg.RemoveBackground();
+        fg.RefineMask();
         // cv::imshow("Original Preview", vp.getFrame());   // Original
         // cv::imshow("Grayscale Preview", cc.getGrayFrame());   // Grayscale
-        cv::imshow("Segmentation Preview", fg.getForegroundFrame());  // Background Removed
+        // cv::imshow("Segmentation Preview", fg.getForegroundFrame());  // Background Removed
+        cv::imshow("Segmentation Refined Preview", fg.getRefinedFrame()); 
         cv::waitKey(25);    
     }
 

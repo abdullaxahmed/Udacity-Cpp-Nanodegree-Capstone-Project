@@ -1,16 +1,14 @@
 #include "detector.h"
 
+/*  Background Removal Imlementation  */
+
 Segmentation::Segmentation(ColorConverter& src) 
     : _src(src), _fgMask(), _refinedMask(), _mog2(cv::createBackgroundSubtractorMOG2(500,500,false)) {};
 // cv::createBackgroundSubtractorMOG2 (int history, double varThreshold, bool detectShadows);
 
 
-const cv::Mat& Segmentation::getForegroundFrame() const {
-    return _fgMask;
-}
-const cv::Mat& Segmentation::getRefinedFrame() const {
-    return _refinedMask;
-}
+const cv::Mat& Segmentation::getForegroundFrame() const { return _fgMask; }
+const cv::Mat& Segmentation::getRefinedFrame() const { return _refinedMask; }
 
 void Segmentation::RemoveBackground() {
     const cv::Mat& src = _src.getGrayFrame();
@@ -19,10 +17,30 @@ void Segmentation::RemoveBackground() {
 
 void Segmentation::RefineMask () {
     cv::Mat kernel = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(2, 2));
-    // cv::getStructuringElement ( shape, kernel size)
     // Create a small cross-shaped structuring element
 
     cv::erode(_fgMask, _refinedMask, kernel);
-    // cv::erode( cv::Mat src, cv::Mat erosion_dst, cv::Mat element );
     // Erode mask to remove small white noise points from the foreground mask
+}
+
+/*  Contour Detection Imlementation  */
+
+ContourDetection::ContourDetection(Segmentation& src) : _src(src) {};
+
+const std::vector<std::vector<cv::Point>>& ContourDetection::getContours() const { return _contours; }
+
+const cv::Mat& ContourDetection::getDrawing() const { return _drawing; }
+
+void ContourDetection::FindContours() {
+    cv::Mat work = _src.getForegroundFrame().clone();
+    _contours.clear();
+
+    cv::findContours(work, _contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
+    // cv::findContours(image, contours, mode, method)
+
+    _drawing = cv::Mat::zeros(work.size(), CV_8UC3);
+    // Create blank image for drawing
+    
+    cv::drawContours(_drawing, _contours, -1, cv::Scalar(0, 255, 0), 2);
+    // Draw all contours 
 }

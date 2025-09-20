@@ -37,4 +37,16 @@ class ContourDetection {
         
 };
 
+class ContourFeatures {
+public:
+    explicit ContourFeatures(ContourDetection& src);
+    const std::vector<cv::Rect>& getBoundingBoxes() const;
+    void ExtractFeatures();
+
+private:
+    ContourDetection& _src;
+    std::vector<cv::Rect> _boxes;
+    // vector for storing Rectangles (Bounding Boxes)
+};
+
 #endif

@@ -46,7 +46,7 @@ void ContourDetection::FindContours() {
     _contours.erase(
         std::remove_if(_contours.begin(), _contours.end(),
                     [](const std::vector<cv::Point>& c) {
-                        return cv::contourArea(c) < 200; // tune this threshold
+                        return cv::contourArea(c) < 200; 
                     }),
         _contours.end()
     );
@@ -62,18 +62,41 @@ void ContourDetection::FindContours() {
 
 ContourFeatures::ContourFeatures(ContourDetection& src) : _src(src) {}
 
-const std::vector<cv::Rect>& ContourFeatures::getBoundingBoxes() const {
-    return _boxes;
-}
-
+const std::vector<cv::Rect>& ContourFeatures::getBoundingBoxes() const { return _boxes; }
+const std::vector<double>& ContourFeatures::getContourAreas() const { return _contourArea; }
+const std::vector<cv::Point2d>& ContourFeatures::getCentroids() const { return _centroids; }
+const std::vector<double>& ContourFeatures::getAspectRatio() const { return _aspectRatio; }
+const std::vector<double>& ContourFeatures::getFillRatio() const { return _fillRatio; }
 
 void ContourFeatures::ExtractFeatures() {
     _boxes.clear();
+    _centroids.clear();
+    _contourArea.clear();
+    _aspectRatio.clear();
 
     for (const auto& contour : _src.getContours()) {
         if (contour.empty()) continue;
         cv::Rect box = cv::boundingRect(contour);
         // cv::boundingRect finds the smallest rectangle that completely encloses the input contour
         _boxes.push_back(box);
+
+        // Calculate Centroids
+        cv::Moments M = cv::moments(contour);
+        cv::Point2d c;
+
+        c.x = M.m10 / M.m00;
+        c.y = M.m01 / M.m00;
+        
+        _centroids.push_back(c);
+
+        // Calculate Areas
+        double area = cv::contourArea(contour);
+        _contourArea.push_back(area);
+
+        // Calculate Aspect Ratios
+        _aspectRatio.push_back(box.width/box.height);
+
+        // Calculate Fill Ratios
+        _fillRatio.push_back(area/(box.width*box.height));
     }
 }

@@ -37,16 +37,26 @@ class ContourDetection {
         
 };
 
+
 class ContourFeatures {
 public:
     explicit ContourFeatures(ContourDetection& src);
     const std::vector<cv::Rect>& getBoundingBoxes() const;
+    const std::vector<double>& getContourAreas() const;
+    const std::vector<cv::Point2d>& getCentroids() const;
+    const std::vector<double>& getAspectRatio() const;
+    const std::vector<double>& getFillRatio() const;
+
     void ExtractFeatures();
 
 private:
     ContourDetection& _src;
     std::vector<cv::Rect> _boxes;
     // vector for storing Rectangles (Bounding Boxes)
+    std::vector<double> _contourArea;
+    std::vector<cv::Point2d> _centroids;
+    std::vector<double> _aspectRatio;
+    std::vector<double> _fillRatio;
 };
 
 #endif

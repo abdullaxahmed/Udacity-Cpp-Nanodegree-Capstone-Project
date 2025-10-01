@@ -3,7 +3,7 @@
 /*  Background Removal Imlementation  */
 
 Segmentation::Segmentation(ColorConverter& src) 
-    : _src(src), _fgMask(), _refinedMask(), _mog2(cv::createBackgroundSubtractorMOG2(500,50,false)) {};
+    : _src(src), _fgMask(), _refinedMask(), _mog2(cv::createBackgroundSubtractorMOG2(800,80,true)) {};
 // cv::createBackgroundSubtractorMOG2 (int history, double varThreshold, bool detectShadows);
 
 
@@ -16,7 +16,7 @@ void Segmentation::RemoveBackground() {
 }
 
 void Segmentation::RefineMask () {
-    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(2, 2));
+    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
     // Create a small cross-shaped structuring element
 
     cv::morphologyEx(_fgMask, _refinedMask, cv::MORPH_CLOSE, kernel);
@@ -46,7 +46,7 @@ void ContourDetection::FindContours() {
     _contours.erase(
         std::remove_if(_contours.begin(), _contours.end(),
                     [](const std::vector<cv::Point>& c) {
-                        return cv::contourArea(c) < 200; 
+                        return cv::contourArea(c) < 500; 
                     }),
         _contours.end()
     );

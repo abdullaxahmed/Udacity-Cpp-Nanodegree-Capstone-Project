@@ -5,7 +5,7 @@
 
 int main(){
     
-    VideoReader vp("../videos/1.mp4");
+    VideoReader vp("../videos/highway.mp4");
     ColorConverter cc(vp);
     Segmentation fg(cc);
     ContourDetection c(fg);
@@ -22,7 +22,7 @@ int main(){
         // cv::imshow("Grayscale Preview", cc.getGrayFrame());   // Grayscale
         // cv::imshow("Segmentation Preview", fg.getForegroundFrame());  // Background Removed
         // cv::imshow("Segmentation Refined Preview", fg.getRefinedFrame());  // Refined Foreground
-        cv::imshow("Contours Preview", c.getDrawing());   // Contour Visualization 
+        // cv::imshow("Contours Preview", c.getDrawing());   // Contour Visualization 
 
         cv::Mat frame = vp.getFrame().clone();
         for (const auto& box : f.getBoundingBoxes()) {
@@ -31,7 +31,7 @@ int main(){
 
         cv::imshow("Bounding Boxes", frame);     
 
-        cv::waitKey(25);    
+        cv::waitKey(15);    
     }
 
     return 0;

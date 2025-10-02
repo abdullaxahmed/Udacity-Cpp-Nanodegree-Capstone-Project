@@ -2,37 +2,32 @@
 
 #include "video_processing.h"
 #include "detector.h"
+#include "display.h"
 
 int main(){
     
-    VideoReader vp("../videos/highway.mp4");
-    ColorConverter cc(vp);
-    Segmentation fg(cc);
-    ContourDetection c(fg);
-    ContourFeatures f(c);
+    VideoReader videoReader("../videos/highway.mp4");
+    ColorConverter colorConverter(videoReader);
+    Segmentation segmentation(colorConverter);
+    ContourDetection contourDetection(segmentation);
+    ContourFeatures contourFeatures(contourDetection);
+    Display display(videoReader, colorConverter, segmentation, contourDetection, contourFeatures);
 
-    while(vp.readFrame()) {
-        cc.ConvertFrameColor();
-        fg.RemoveBackground();
-        fg.RefineMask();
-        c.FindContours();
-        f.ExtractFeatures();
+while (videoReader.readFrame()) {
+    colorConverter.ConvertFrameColor();
+    segmentation.RemoveBackground();
+    segmentation.RefineMask();
+    contourDetection.FindContours();
+    contourFeatures.ExtractFeatures();
 
-        // cv::imshow("Original Preview", vp.getFrame());   // Original
-        // cv::imshow("Grayscale Preview", cc.getGrayFrame());   // Grayscale
-        // cv::imshow("Segmentation Preview", fg.getForegroundFrame());  // Background Removed
-        // cv::imshow("Segmentation Refined Preview", fg.getRefinedFrame());  // Refined Foreground
-        // cv::imshow("Contours Preview", c.getDrawing());   // Contour Visualization 
+    display.renderBoxes();
+    display.show();
 
-        cv::Mat frame = vp.getFrame().clone();
-        for (const auto& box : f.getBoundingBoxes()) {
-            cv::rectangle(frame, box, cv::Scalar(0, 0, 255), 2);
-        }
-
-        cv::imshow("Bounding Boxes", frame);     
-
-        cv::waitKey(15);    
-    }
+    // // cv::imshow("Gray", colorConverter.getGrayFrame());
+    // // cv::imshow("ForegroundMask", segmentation.getForegroundFrame());
+    // // cv::imshow("RefinedMask", segmentation.getRefinedFrame());
+    // // cv::imshow("Contours", contourDetection.getDrawing());
+}
 
     return 0;
 }

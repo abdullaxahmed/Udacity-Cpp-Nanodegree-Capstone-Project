@@ -6,6 +6,10 @@ Segmentation::Segmentation(ColorConverter& src)
     : _src(src), _fgMask(), _refinedMask(), _mog2(cv::createBackgroundSubtractorMOG2(800,80,true)) {};
 // cv::createBackgroundSubtractorMOG2 (int history, double varThreshold, bool detectShadows);
 
+Segmentation::Segmentation(ColorConverter& src, int history, double varThresh, bool detectShadows)
+: _src(src) {
+    _mog2 = cv::createBackgroundSubtractorMOG2(history, varThresh, detectShadows);
+}
 
 const cv::Mat& Segmentation::getForegroundFrame() const { return _fgMask; }
 const cv::Mat& Segmentation::getRefinedFrame() const { return _refinedMask; }
@@ -31,6 +35,9 @@ void Segmentation::RefineMask () {
 
 ContourDetection::ContourDetection(Segmentation& src) : _src(src) {};
 
+ContourDetection::ContourDetection(Segmentation& src, double minArea)
+: _src(src), _minArea(minArea) {}
+
 const std::vector<std::vector<cv::Point>>& ContourDetection::getContours() const { return _contours; }
 
 const cv::Mat& ContourDetection::getDrawing() const { return _drawing; }
@@ -45,8 +52,8 @@ void ContourDetection::FindContours() {
 
     _contours.erase(
         std::remove_if(_contours.begin(), _contours.end(),
-                    [](const std::vector<cv::Point>& c) {
-                        return cv::contourArea(c) < 500; 
+                    [this](const std::vector<cv::Point>& c) {
+                        return cv::contourArea(c) < _minArea; 
                     }),
         _contours.end()
     );

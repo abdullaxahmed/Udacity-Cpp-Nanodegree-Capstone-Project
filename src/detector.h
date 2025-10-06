@@ -8,6 +8,7 @@
 class Segmentation {
     public:
         explicit Segmentation(ColorConverter& src);
+        explicit Segmentation(ColorConverter& src, int history, double varThresh, bool detectShadows);
         const cv::Mat& getForegroundFrame() const;
         const cv::Mat& getRefinedFrame() const;
         void RemoveBackground();
@@ -24,9 +25,11 @@ class Segmentation {
 class ContourDetection {
     public:
         explicit ContourDetection(Segmentation& src);
+        explicit ContourDetection(Segmentation& src, double minArea);
         const std::vector<std::vector<cv::Point>>& getContours() const;
         const cv::Mat& getDrawing() const;
         void FindContours();
+        int getCount() const { return (int)_contours.size(); }
 
     private:
         Segmentation& _src;
@@ -34,6 +37,7 @@ class ContourDetection {
         // 2D vector for storing all detected contours
         
         cv::Mat _drawing;
+        double _minArea = 500.0;
         
 };
 

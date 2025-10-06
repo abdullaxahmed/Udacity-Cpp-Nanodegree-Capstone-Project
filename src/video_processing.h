@@ -4,6 +4,12 @@
 #ifndef VIDEO_PROCESSING_H
 #define VIDEO_PROCESSING_H
 
+class Segmentation;
+class ContourDetection;
+class ContourFeatures;
+class Display;
+class Logger;
+
 class VideoReader {
     public:
 
@@ -34,5 +40,13 @@ class ColorConverter {
         VideoReader& _src;
         cv::Mat _grayFrame;
 };
+
+void processVideo(VideoReader& videoReader,
+                  ColorConverter& colorConverter,
+                  Segmentation& segmentation,
+                  ContourDetection& contourDetection,
+                  ContourFeatures& contourFeatures,
+                  Display& display,
+                  Logger& logger);
 
 #endif

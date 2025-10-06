@@ -20,7 +20,7 @@ void Display::renderBoxes() {
 
 int Display::show() {
     cv::imshow("Detections", boxedFrame_);
-    return cv::waitKey(10);
+    return cv::waitKey(3);
 }
 
 const cv::Mat& Display::frame() const {

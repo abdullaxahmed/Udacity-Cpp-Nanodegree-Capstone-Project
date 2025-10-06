@@ -3,31 +3,24 @@
 #include "video_processing.h"
 #include "detector.h"
 #include "display.h"
+#include "config_io.h"
 
-int main(){
-    
-    VideoReader videoReader("../videos/highway.mp4");
+int main() {
+    Params params = loadParams("../config/parameters.txt");
+
+    VideoReader videoReader(params.video);
+    if (!videoReader.getCap().isOpened()) {
+        std::cout << "Error: Cannot open video file!\n";
+        return -1;
+    }
+
     ColorConverter colorConverter(videoReader);
-    Segmentation segmentation(colorConverter);
-    ContourDetection contourDetection(segmentation);
+    Segmentation segmentation(colorConverter, params.history, params.thresh, params.shadows);
+    ContourDetection contourDetection(segmentation, params.minarea);
     ContourFeatures contourFeatures(contourDetection);
     Display display(videoReader, colorConverter, segmentation, contourDetection, contourFeatures);
+    Logger logger(params.log);
 
-while (videoReader.readFrame()) {
-    colorConverter.ConvertFrameColor();
-    segmentation.RemoveBackground();
-    segmentation.RefineMask();
-    contourDetection.FindContours();
-    contourFeatures.ExtractFeatures();
-
-    display.renderBoxes();
-    display.show();
-
-    // // cv::imshow("Gray", colorConverter.getGrayFrame());
-    // // cv::imshow("ForegroundMask", segmentation.getForegroundFrame());
-    // // cv::imshow("RefinedMask", segmentation.getRefinedFrame());
-    // // cv::imshow("Contours", contourDetection.getDrawing());
-}
-
+    processVideo(videoReader, colorConverter, segmentation, contourDetection, contourFeatures, display, logger);
     return 0;
 }

@@ -1,0 +1,17 @@
+# Path to the input video file
+video=../videos/highway.mp4
+
+# MOG2 background model history (number of frames remembered)
+history=800
+
+# MOG2 variance threshold (higher => less sensitive to foreground)
+thresh=80.0
+
+# Minimum contour area in pixels (filters out tiny noise blobs)
+minarea=500
+
+# Detect shadows in MOG2 (1 = on, 0 = off)
+shadows=1
+
+# CSV output path for logging (frame,objects,fps); 
+log=run_log.csv

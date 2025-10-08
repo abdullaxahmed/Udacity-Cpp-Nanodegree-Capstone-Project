@@ -23,7 +23,9 @@ int main() {
     Display display(*videoReader, *colorConverter, *segmentation, *contourDetection, *contourFeatures);
     Logger logger(params.log);
 
-    processVideo(*videoReader, *colorConverter, *segmentation, *contourDetection, *contourFeatures, display, logger);
+    auto fps_future = processVideoConcurrent(*videoReader, *colorConverter, *segmentation, *contourDetection, *contourFeatures, display, logger);
+    double avg_fps = fps_future.get();
+    std::cout << "Average FPS: " << avg_fps << "\n";
 
     return 0;
 }

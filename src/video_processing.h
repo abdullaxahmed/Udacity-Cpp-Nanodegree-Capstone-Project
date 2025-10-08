@@ -1,6 +1,7 @@
 #include <opencv2/opencv.hpp>
 #include <string>
 #include <memory>
+#include <future>
 
 #ifndef VIDEO_PROCESSING_H
 #define VIDEO_PROCESSING_H
@@ -25,6 +26,7 @@ class VideoReader {
         const std::string& getPath() const;
 
         bool readFrame();
+        void setFrameForProcessing(const cv::Mat& f);
 
     private:
         cv::VideoCapture _cap;  // Manages video stream
@@ -37,18 +39,19 @@ class ColorConverter {
         explicit ColorConverter(std::shared_ptr<VideoReader> src);
         const cv::Mat& getGrayFrame() const;
         void ConvertFrameColor();
+        void ConvertFrameColor(const cv::Mat& src);
 
     private:
         std::shared_ptr<VideoReader> _src;
         cv::Mat _grayFrame;
 };
 
-void processVideo(VideoReader& videoReader,
-                  ColorConverter& colorConverter,
-                  Segmentation& segmentation,
-                  ContourDetection& contourDetection,
-                  ContourFeatures& contourFeatures,
-                  Display& display,
-                  Logger& logger);
+void processVideo(VideoReader& videoReader, ColorConverter& colorConverter, Segmentation& segmentation,
+                  ContourDetection& contourDetection, ContourFeatures& contourFeatures,
+                  Display& display, Logger& logger);
+
+std::future<double> processVideoConcurrent(VideoReader& videoReader, ColorConverter& colorConverter, Segmentation& segmentation,
+                  ContourDetection& contourDetection, ContourFeatures& contourFeatures,
+                  Display& display, Logger& logger);
 
 #endif

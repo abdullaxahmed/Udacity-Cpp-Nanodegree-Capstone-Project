@@ -40,7 +40,7 @@ void Segmentation::RefineMask () {
     // cv::morphologyEx and cv::MORPH_CLOSE to fill small holes and connect
     // nearby foreground regions, making vehicles appear as solid blobs.
 
-    cv::erode(_fgMask, _refinedMask, kernel);
+    cv::erode(_refinedMask, _refinedMask, kernel);
     // Erode mask to remove small white noise points from the foreground mask
 }
 
@@ -56,7 +56,7 @@ const std::vector<std::vector<cv::Point>>& ContourDetection::getContours() const
 const cv::Mat& ContourDetection::getDrawing() const { return _drawing; }
 
 void ContourDetection::FindContours() {
-    cv::Mat work = _src->getForegroundFrame().clone();
+    cv::Mat work = _src->getRefinedFrame().clone();
     _contours.clear();
 
     cv::findContours(work, _contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);

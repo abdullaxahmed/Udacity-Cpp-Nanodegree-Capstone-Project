@@ -1,5 +1,6 @@
 #include <opencv2/opencv.hpp>
 #include <string>
+#include <memory>
 
 #ifndef VIDEO_PROCESSING_H
 #define VIDEO_PROCESSING_H
@@ -15,6 +16,7 @@ class VideoReader {
 
         explicit VideoReader(const std::string& path);
         VideoReader() = default;
+        ~VideoReader();
 
         cv::VideoCapture& getCap();
         void setCap(const std::string& path);
@@ -32,12 +34,12 @@ class VideoReader {
 
 class ColorConverter {
     public:
-        explicit ColorConverter(VideoReader& src);
+        explicit ColorConverter(std::shared_ptr<VideoReader> src);
         const cv::Mat& getGrayFrame() const;
         void ConvertFrameColor();
 
     private:
-        VideoReader& _src;
+        std::shared_ptr<VideoReader> _src;
         cv::Mat _grayFrame;
 };
 

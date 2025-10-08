@@ -7,6 +7,12 @@ VideoReader::VideoReader(const std::string& path) : _path(path) {
     _cap.open(path);
 }
 
+VideoReader::~VideoReader() {
+    if (_cap.isOpened()) {
+        _cap.release();
+    }
+}
+
 cv::VideoCapture& VideoReader::getCap() {
     return _cap;
 }
@@ -28,14 +34,14 @@ bool VideoReader::readFrame() {
     return _cap.read(_frame);
 }
 
-ColorConverter::ColorConverter(VideoReader& src) : _src(src) {};
+ColorConverter::ColorConverter(std::shared_ptr<VideoReader> src) : _src(std::move(src)) {};
 
 const cv::Mat& ColorConverter::getGrayFrame() const {
     return _grayFrame;
 }
 
 void ColorConverter::ConvertFrameColor() {
-    const cv::Mat& src = _src.getFrame();
+    const cv::Mat& src = _src->getFrame();
     cvtColor(src, _grayFrame, cv::COLOR_BGR2GRAY);  // Convert BGR frames to grayscale 
 }
 

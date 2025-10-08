@@ -5,11 +5,15 @@
 
 class Display {
 public:
-    Display(VideoReader& videoReader,
-            ColorConverter& colorConverter,
-            Segmentation& segmentation,
-            ContourDetection& contourDetection,
-            ContourFeatures& contourFeatures);
+    Display(VideoReader& videoReader, ColorConverter& colorConverter, Segmentation& segmentation,
+            ContourDetection& contourDetection, ContourFeatures& contourFeatures);
+    
+    ~Display();
+
+    // Don't allow display copy
+
+    Display(const Display&) = delete;
+    Display& operator=(const Display&) = delete;
 
     void renderBoxes();
     int  show();

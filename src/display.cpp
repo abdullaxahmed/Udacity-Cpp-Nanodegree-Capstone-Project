@@ -1,15 +1,13 @@
 #include "display.h"
 
-Display::Display(VideoReader& videoReader,
-                 ColorConverter& colorConverter,
-                 Segmentation& segmentation,
-                 ContourDetection& contourDetection,
-                 ContourFeatures& contourFeatures)
-    : videoReader_(videoReader),
-      colorConverter_(colorConverter),
-      segmentation_(segmentation),
-      contourDetection_(contourDetection),
-      contourFeatures_(contourFeatures) {}
+Display::Display(VideoReader& videoReader, ColorConverter& colorConverter, Segmentation& segmentation,
+                 ContourDetection& contourDetection, ContourFeatures& contourFeatures)
+    : videoReader_(videoReader), colorConverter_(colorConverter), segmentation_(segmentation),
+      contourDetection_(contourDetection), contourFeatures_(contourFeatures) {}
+
+Display::~Display() {
+    cv::destroyAllWindows();
+}
 
 void Display::renderBoxes() {
     boxedFrame_ = videoReader_.getFrame().clone();

@@ -7,15 +7,22 @@
 
 class Segmentation {
     public:
-        explicit Segmentation(ColorConverter& src);
-        explicit Segmentation(ColorConverter& src, int history, double varThresh, bool detectShadows);
+        explicit Segmentation(std::shared_ptr<ColorConverter> src, int history, double varThresh, bool detectShadows);
+        
+        // Rule of 5
+        ~Segmentation();
+        Segmentation(const Segmentation&) = delete;
+        Segmentation& operator=(const Segmentation&) = delete;
+        Segmentation(Segmentation&&) noexcept;
+        Segmentation& operator=(Segmentation&&) noexcept;
+        
         const cv::Mat& getForegroundFrame() const;
         const cv::Mat& getRefinedFrame() const;
         void RemoveBackground();
         void RefineMask();
 
     private:
-        ColorConverter& _src;
+        std::shared_ptr<ColorConverter> _src;
         cv::Mat _fgMask;
         // Pointer to MOG2 background subtractor
         cv::Ptr<cv::BackgroundSubtractorMOG2> _mog2; 
@@ -24,15 +31,15 @@ class Segmentation {
 
 class ContourDetection {
     public:
-        explicit ContourDetection(Segmentation& src);
-        explicit ContourDetection(Segmentation& src, double minArea);
+        explicit ContourDetection(std::shared_ptr<Segmentation> src);
+        explicit ContourDetection(std::shared_ptr<Segmentation> src, double minArea);
         const std::vector<std::vector<cv::Point>>& getContours() const;
         const cv::Mat& getDrawing() const;
         void FindContours();
         int getCount() const { return (int)_contours.size(); }
 
     private:
-        Segmentation& _src;
+        std::shared_ptr<Segmentation> _src;
         std::vector<std::vector<cv::Point>> _contours;
         // 2D vector for storing all detected contours
         
@@ -44,7 +51,7 @@ class ContourDetection {
 
 class ContourFeatures {
 public:
-    explicit ContourFeatures(ContourDetection& src);
+    explicit ContourFeatures(std::shared_ptr<ContourDetection> src);
     const std::vector<cv::Rect>& getBoundingBoxes() const;
     const std::vector<double>& getContourAreas() const;
     const std::vector<cv::Point2d>& getCentroids() const;
@@ -54,7 +61,7 @@ public:
     void ExtractFeatures();
 
 private:
-    ContourDetection& _src;
+    std::shared_ptr<ContourDetection> _src;
     std::vector<cv::Rect> _boxes;
     // vector for storing Rectangles (Bounding Boxes)
     std::vector<double> _contourArea;

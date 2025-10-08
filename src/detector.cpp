@@ -2,20 +2,33 @@
 
 /*  Background Removal Imlementation  */
 
-Segmentation::Segmentation(ColorConverter& src) 
-    : _src(src), _fgMask(), _refinedMask(), _mog2(cv::createBackgroundSubtractorMOG2(800,80,true)) {};
+Segmentation::Segmentation(std::shared_ptr<ColorConverter> src, int history, double varThresh, bool detectShadows)
+: _src(std::move(src)) {
+    _mog2 = cv::createBackgroundSubtractorMOG2(history, varThresh, detectShadows);
+}
 // cv::createBackgroundSubtractorMOG2 (int history, double varThreshold, bool detectShadows);
 
-Segmentation::Segmentation(ColorConverter& src, int history, double varThresh, bool detectShadows)
-: _src(src) {
-    _mog2 = cv::createBackgroundSubtractorMOG2(history, varThresh, detectShadows);
+Segmentation::~Segmentation() = default;
+
+Segmentation::Segmentation(Segmentation&& other) noexcept
+    : _src(std::move(other._src)), _fgMask(std::move(other._fgMask)),_mog2(std::move(other._mog2)),
+      _refinedMask(std::move(other._refinedMask)) {}
+
+Segmentation& Segmentation::operator=(Segmentation&& other) noexcept {
+    if (this != &other) {
+        _src = std::move(other._src);
+        _fgMask = std::move(other._fgMask);
+        _mog2 = std::move(other._mog2);
+        _refinedMask = std::move(other._refinedMask);
+    }
+    return *this;
 }
 
 const cv::Mat& Segmentation::getForegroundFrame() const { return _fgMask; }
 const cv::Mat& Segmentation::getRefinedFrame() const { return _refinedMask; }
 
 void Segmentation::RemoveBackground() {
-    const cv::Mat& src = _src.getGrayFrame();
+    const cv::Mat& src = _src->getGrayFrame();
     _mog2->apply(src,_fgMask);  // apply MOG2 (Gaussian Mixture-based Background/Foreground Segmentation Algorithm)
 }
 
@@ -33,17 +46,17 @@ void Segmentation::RefineMask () {
 
 /*  Contour Detection Imlementation  */
 
-ContourDetection::ContourDetection(Segmentation& src) : _src(src) {};
+ContourDetection::ContourDetection(std::shared_ptr<Segmentation> src) : _src(std::move(src)) {};
 
-ContourDetection::ContourDetection(Segmentation& src, double minArea)
-: _src(src), _minArea(minArea) {}
+ContourDetection::ContourDetection(std::shared_ptr<Segmentation> src, double minArea)
+: _src(std::move(src)), _minArea(minArea) {}
 
 const std::vector<std::vector<cv::Point>>& ContourDetection::getContours() const { return _contours; }
 
 const cv::Mat& ContourDetection::getDrawing() const { return _drawing; }
 
 void ContourDetection::FindContours() {
-    cv::Mat work = _src.getForegroundFrame().clone();
+    cv::Mat work = _src->getForegroundFrame().clone();
     _contours.clear();
 
     cv::findContours(work, _contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
@@ -67,7 +80,7 @@ void ContourDetection::FindContours() {
 
 /*  Feature Extraction Imlementation  */
 
-ContourFeatures::ContourFeatures(ContourDetection& src) : _src(src) {}
+ContourFeatures::ContourFeatures(std::shared_ptr<ContourDetection> src) : _src(std::move(src)) {}
 
 const std::vector<cv::Rect>& ContourFeatures::getBoundingBoxes() const { return _boxes; }
 const std::vector<double>& ContourFeatures::getContourAreas() const { return _contourArea; }
@@ -81,7 +94,7 @@ void ContourFeatures::ExtractFeatures() {
     _contourArea.clear();
     _aspectRatio.clear();
 
-    for (const auto& contour : _src.getContours()) {
+    for (const auto& contour : _src->getContours()) {
         if (contour.empty()) continue;
         cv::Rect box = cv::boundingRect(contour);
         // cv::boundingRect finds the smallest rectangle that completely encloses the input contour

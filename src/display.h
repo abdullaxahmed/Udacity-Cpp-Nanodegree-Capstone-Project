@@ -10,12 +10,13 @@ public:
     
     ~Display();
 
-    // Don't allow display copy
+    // No copy rule
 
     Display(const Display&) = delete;
     Display& operator=(const Display&) = delete;
 
     void renderBoxes();
+    void renderBoxes(const cv::Mat& frame);
     int  show();
     const cv::Mat& frame() const;
 

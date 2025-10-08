@@ -16,9 +16,16 @@ void Display::renderBoxes() {
     }
 }
 
+void Display::renderBoxes(const cv::Mat& frame) {
+    boxedFrame_ = frame.clone();
+    for (const auto& box : contourFeatures_.getBoundingBoxes()) {
+        cv::rectangle(boxedFrame_, box, cv::Scalar(0, 0, 255), 2);
+    }
+}
+
 int Display::show() {
     cv::imshow("Detections", boxedFrame_);
-    return cv::waitKey(3);
+    return cv::waitKey(25);
 }
 
 const cv::Mat& Display::frame() const {

@@ -14,4 +14,4 @@ minarea=500
 shadows=1
 
 # CSV output path for logging (frame,objects,fps); 
-log=run_log.csv
+log=../logs/run_log.csv

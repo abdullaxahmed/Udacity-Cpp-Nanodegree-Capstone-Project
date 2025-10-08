@@ -8,19 +8,22 @@
 int main() {
     Params params = loadParams("../config/parameters.txt");
 
-    VideoReader videoReader(params.video);
-    if (!videoReader.getCap().isOpened()) {
+    auto videoReader = std::make_shared<VideoReader>(params.video);
+    if (!videoReader->getCap().isOpened()) {
         std::cout << "Error: Cannot open video file!\n";
-        return -1;
+        return -1;  // exit error
     }
 
-    ColorConverter colorConverter(videoReader);
-    Segmentation segmentation(colorConverter, params.history, params.thresh, params.shadows);
-    ContourDetection contourDetection(segmentation, params.minarea);
-    ContourFeatures contourFeatures(contourDetection);
-    Display display(videoReader, colorConverter, segmentation, contourDetection, contourFeatures);
+    auto colorConverter = std::make_shared<ColorConverter>(videoReader);
+    auto segmentation = std::make_shared<Segmentation>(colorConverter, params.history, params.thresh, params.shadows);
+    auto contourDetection = std::make_shared<ContourDetection>(segmentation, params.minarea);
+    auto contourFeatures = std::make_shared<ContourFeatures>(contourDetection);
+
+
+    Display display(*videoReader, *colorConverter, *segmentation, *contourDetection, *contourFeatures);
     Logger logger(params.log);
 
-    processVideo(videoReader, colorConverter, segmentation, contourDetection, contourFeatures, display, logger);
+    processVideo(*videoReader, *colorConverter, *segmentation, *contourDetection, *contourFeatures, display, logger);
+
     return 0;
 }

@@ -2,7 +2,7 @@
 A high-performance C++ application for real-time vehicle detection using OpenCV's background subtraction and contour analysis techniques. This project was developed as a Capstone final project for the Udacity C++ Nanodegree program.
 
 <p align="center">
-  <img src="images/frame_bounding_boxes.png" alt="Vehicle Detection" width="800">
+  <img src="images/Vehicle Detection.gif" alt="Vehicle Detection" width="800">
 </p>
 
 ## Overview
